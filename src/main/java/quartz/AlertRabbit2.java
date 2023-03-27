@@ -12,6 +12,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Чтение из файла rabbit.properties с периодичностью в 10 секунд
+ * withIntervalInSeconds() ожидает на вход число, а properties - это строка
  */
 public class AlertRabbit2 {
     public static void main(String[] args) throws SchedulerException {
@@ -19,7 +20,7 @@ public class AlertRabbit2 {
         scheduler.start();
         JobDetail job = newJob(AlertRabbit2.Rabbit2.class).build();
         SimpleScheduleBuilder times = SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInSeconds(10)
+                .withIntervalInSeconds(Integer.parseInt(readeProperties().getProperty("rabbit.properties")))
                 .repeatForever();
         Trigger trigger = newTrigger()
                 .startNow()
@@ -27,6 +28,7 @@ public class AlertRabbit2 {
                 .build();
         scheduler.scheduleJob(job, trigger);
     }
+
     public static Properties readeProperties() {
         Properties config = new Properties();
         try (InputStream in = AlertRabbit2.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
@@ -41,7 +43,7 @@ public class AlertRabbit2 {
 
         @Override
         public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-            readeProperties();
+            System.out.println("Rabbit runs here ... ");
 
         }
     }
