@@ -3,5 +3,6 @@ create table post(
 	name varchar(250),
     text text,
 	link text,
-	created date
+	created date,
+	UNIQUE(created)
 );
