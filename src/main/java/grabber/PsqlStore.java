@@ -84,20 +84,21 @@ public class PsqlStore implements Store {
 
     @Override
     public Post findById(int id) {
+        Post post = new Post();
         try (PreparedStatement statement = conn.prepareStatement("SELECT * FROM post where id = ?")) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                resultSet.getInt("id");
-                resultSet.getString("name");
-                resultSet.getString("text");
-                resultSet.getString("link");
-                resultSet.getTimestamp("created").toLocalDateTime();
+                post.setId(resultSet.getInt("id"));
+                post.setTitle(resultSet.getString("name"));
+                post.setDescription(resultSet.getString("text"));
+                post.setLink(resultSet.getString("link"));
+                post.setCreated(resultSet.getTimestamp("created").toLocalDateTime());
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return null;
+        return post;
     }
 
     @Override
@@ -139,6 +140,6 @@ public class PsqlStore implements Store {
         psqlStore.save(post);
         psqlStore.save(post2);
         psqlStore.getAll();
-        psqlStore.findById(2);
+        System.out.println(psqlStore.findById(4).toString());
     }
 }
