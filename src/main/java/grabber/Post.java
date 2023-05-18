@@ -16,11 +16,11 @@ public class Post {
 
     }
 
-    public Post(int id, String title, String link, String description, LocalDateTime created) {
+    public Post(int id, String title, String description, String link, LocalDateTime created) {
         this.id = id;
         this.title = title;
-        this.link = link;
         this.description = description;
+        this.link = link;
         this.created = created;
     }
 
@@ -57,14 +57,13 @@ public class Post {
         this.description = description;
     }
 
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
     public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
+    public LocalDateTime getCreated() {
+        return created;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -82,4 +81,6 @@ public class Post {
     public int hashCode() {
         return Objects.hash(id, link);
     }
+
+
 }
