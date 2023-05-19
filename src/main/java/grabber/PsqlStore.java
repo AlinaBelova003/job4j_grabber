@@ -41,7 +41,7 @@ public class PsqlStore implements Store {
      * если уже существует запись с тем же значением в столбце link. Это позволяет избежать дублирования записей в таблице.
      */
     @Override
-    public void save(Post post) {
+    public Post save(Post post) {
         try (PreparedStatement statement = conn.prepareStatement("INSERT INTO post(name, text, link, created) VALUES( ?, ?, ?, ?) ON CONFLICT (link) DO NOTHING;",
                 Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
@@ -58,7 +58,7 @@ public class PsqlStore implements Store {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
+        return post;
     }
 
     @Override
@@ -136,10 +136,11 @@ public class PsqlStore implements Store {
                 LocalDateTime.of(2023, 5, 15, 12, 24, 0));
         Post post2 = new Post(2, "Разработчик базы данных для рекламной системы", "java developer Middle", "https://yandex.ru/jobs/vacancies/разработчик-базы",
                 LocalDateTime.of(2023, 6, 18, 6, 24, 0));
+        Post post3 = new Post(3, "Разработчик сервиса", "java developer ТГ", "sberbank.com",
+                LocalDateTime.of(2023, 3, 25, 12, 43, 0));
         PsqlStore psqlStore = new PsqlStore(load());
-        psqlStore.save(post);
-        psqlStore.save(post2);
-        psqlStore.getAll();
-        System.out.println(psqlStore.findById(4).toString());
+        post = psqlStore.save(post);
+        System.out.println(psqlStore.getAll());
+        System.out.println(psqlStore.findById(post.getId()).toString());
     }
 }
