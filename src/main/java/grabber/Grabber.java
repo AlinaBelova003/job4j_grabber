@@ -60,7 +60,7 @@ public class Grabber implements Grab {
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
             try {
-                for (Post post : parse.list("https://career.habr.com/vacancies/java_developer?page=")) {
+                for (Post post : parse.list("https://career.habr.com/vacancies/java_developer?")) {
                     store.save(post);
                 }
             } catch (IOException e) {

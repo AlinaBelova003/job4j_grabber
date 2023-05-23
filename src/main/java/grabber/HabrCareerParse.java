@@ -46,7 +46,7 @@ public class HabrCareerParse implements Parse {
                 Element linkElement = titleElement.child(0);
                 post.setTitle(titleElement.text());
                 post.setLink(String.format("%s%s", SOURCE_LINK, linkElement.attr("href")));
-                post.setCreated(dateTimeParser.parse(dateElement.text()));
+                post.setCreated(dateTimeParser.parse(dateElement.child(0).attr("datetime")));
                 try {
                     post.setDescription(retrieveDescription(post.getLink()));
                 } catch (IOException e) {
