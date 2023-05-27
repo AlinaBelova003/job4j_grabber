@@ -60,7 +60,7 @@ public class Grabber implements Grab {
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
             try {
-                for (Post post : parse.list("https://career.habr.com/vacancies/java_developer?")) {
+                for (Post post : parse.list("https://career.habr.com/vacancies/java_developer?page=1")) {
                     store.save(post);
                 }
             } catch (IOException e) {
@@ -76,7 +76,7 @@ public class Grabber implements Grab {
         try (InputStream in = Grabber.class.getClassLoader().getResourceAsStream("post.properties")) {
             cfg.load(in);
         }
-        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
         scheduler.start();
         System.out.println("Создание экземпляра планировщика, начало работы");
         var parse = new HabrCareerParse(new HabrCareerDateTimeParser());
