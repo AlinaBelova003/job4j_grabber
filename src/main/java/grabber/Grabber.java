@@ -3,9 +3,13 @@ package grabber;
 import grabber.utils.HabrCareerDateTimeParser;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import quartz.AlertRabbit2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,11 +23,16 @@ public class Grabber implements Grab {
     private final Scheduler scheduler;
     private final int time;
 
+
     public Grabber(Parse parse, Store store, Scheduler scheduler, int time) {
         this.parse = parse;
         this.store = store;
         this.scheduler = scheduler;
         this.time = time;
+    }
+
+    public Grabber() {
+
     }
 
     @Override
@@ -69,21 +78,50 @@ public class Grabber implements Grab {
         }
     }
 
+    /**
+     * Этот код представляет метод web(), который запускает веб-сервер на указанном порту и выводит все записи из объекта store в ответ на любой запрос.
+     *Внутри метода создается новый поток, который слушает входящие соединения на указанном порту. Когда соединение установлено, метод отправляет HTTP-ответ со статусом 200 OK и выводит все записи из объекта store в ответ на запрос.
+     *В цикле for происходит итерация по всем записям в объекте store с помощью метода getAll(). Для каждой записи метод toString() вызывается для преобразования записи в строку, которая затем отправляется в ответ на запрос.
+     * @param store
+     */
+    public void web(Store store) {
+        new Thread(() -> {
+            try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
+                while (!server.isClosed()) {
+                    Socket socket = server.accept();
+                    try (OutputStream out = socket.getOutputStream()) {
+                        out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+                        for (Post post : store.getAll()) {
+                            out.write(post.toString().getBytes());
+                            out.write(System.lineSeparator().getBytes());
+                        }
+                    } catch (IOException io) {
+                        io.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
+    public void cfg() {
+        Properties config = new Properties();
+        try (InputStream in = Grabber.class.getClassLoader().getResourceAsStream("post.properties")) {
+            config.load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) throws Exception {
-        var cfg = new Properties();
-        try (InputStream in = Grabber.class.getClassLoader().getResourceAsStream("post.properties")) {
-            cfg.load(in);
-        }
-         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-        scheduler.start();
-        System.out.println("Создание экземпляра планировщика, начало работы");
-        var parse = new HabrCareerParse(new HabrCareerDateTimeParser());
-        System.out.println("Парсинг всех вакансий со страницы");
-        var store = new PsqlStore(cfg);
-        System.out.println("Подключение через конфиг к БД");
-        var time = Integer.parseInt(cfg.getProperty("time"));
-        new Grabber(parse, store, scheduler, time).start();
+        Grabber grab = new Grabber();
+        grab.cfg();
+        Scheduler scheduler = grab.scheduler();
+        Store store = grab.store();
+        grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()), store, scheduler);
+        grab.web(store);
     }
+
+
 }
