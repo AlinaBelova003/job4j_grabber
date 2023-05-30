@@ -16,22 +16,10 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class Grabber implements Grab {
-    private final Parse parse;
-    private final Store store;
-    private final Scheduler scheduler;
-    private final int time;
-
     private final Properties properties = new Properties();
+    private static final String LINK = "https://career.habr.com/vacancies/java_developer?page=1";
 
-    public Grabber(Parse parse, Store store, Scheduler scheduler, int time) {
-        this.parse = parse;
-        this.store = store;
-        this.scheduler = scheduler;
-        this.time = time;
-    }
 
-    public Grabber() {
-    }
 
     public static class GrabJob implements Job {
         /**
@@ -43,7 +31,7 @@ public class Grabber implements Grab {
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
             try {
-                for (Post post : parse.list("https://career.habr.com/vacancies/java_developer?page=1")) {
+                for (Post post : parse.list(LINK)) {
                     store.save(post);
                 }
             } catch (IOException e) {
@@ -56,7 +44,6 @@ public class Grabber implements Grab {
      * Этот код представляет метод web(), который запускает веб-сервер на указанном порту и выводит все записи из объекта store в ответ на любой запрос.
      *Внутри метода создается новый поток, который слушает входящие соединения на указанном порту. Когда соединение установлено, метод отправляет HTTP-ответ со статусом 200 OK и выводит все записи из объекта store в ответ на запрос.
      *В цикле for происходит итерация по всем записям в объекте store с помощью метода getAll(). Для каждой записи метод toString() вызывается для преобразования записи в строку, которая затем отправляется в ответ на запрос.
-     * @param store
      */
     public void web(Store store) {
         new Thread(() -> {
@@ -116,7 +103,7 @@ public class Grabber implements Grab {
                 .usingJobData(data)
                 .build();
         SimpleScheduleBuilder times = simpleSchedule()
-                .withIntervalInSeconds(time)
+                .withIntervalInSeconds(Integer.parseInt(properties.getProperty("time")))
                 .repeatForever();
         Trigger trigger = newTrigger()
                 .startNow()
