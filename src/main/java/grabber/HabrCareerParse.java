@@ -57,9 +57,4 @@ public class HabrCareerParse implements Parse {
         }
         return list;
     }
-
-    public static void main(String[] args) throws IOException {
-        HabrCareerParse parse = new HabrCareerParse(new HabrCareerDateTimeParser());
-        System.out.println(parse.list(PAGE_LINK));
-    }
     }

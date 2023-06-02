@@ -122,25 +122,4 @@ public class PsqlStore implements Store {
         return properties;
     }
 
-    /**
-     * 1. Создает объект Post, инициализируя его поля значениями.
-     * 2. Создает объект PsqlStore, передавая в его конструктор результат вызова метода load(), который загружает свойства из файла "post.properties".
-     * 3. Сохраняет созданный объект Post в базе данных, вызывая метод save у объекта PsqlStore.
-     * 4. Получает все записи из базы данных, вызывая метод getAll у объекта PsqlStore.
-     * 5. Ищет запись с идентификатором 2 в базе данных, вызывая метод findById у объекта PsqlStore.
-     *
-     * Код демонстрирует пример использования объекта PsqlStore для сохранения и получения записей из базы данных.
-     */
-    public static void main(String[] args) {
-        Post post = new Post(1, "java developer", "java developer job", "www.example.com",
-                LocalDateTime.of(2023, 5, 15, 12, 24, 0));
-        Post post2 = new Post(2, "Разработчик базы данных для рекламной системы", "java developer Middle", "https://yandex.ru/jobs/vacancies/разработчик-базы",
-                LocalDateTime.of(2023, 6, 18, 6, 24, 0));
-        Post post3 = new Post(3, "Разработчик сервиса", "java developer ТГ", "sberbank.com",
-                LocalDateTime.of(2023, 3, 25, 12, 43, 0));
-        PsqlStore psqlStore = new PsqlStore(load());
-        post = psqlStore.save(post);
-        System.out.println(psqlStore.getAll());
-        System.out.println(psqlStore.findById(post.getId()).toString());
-    }
 }
